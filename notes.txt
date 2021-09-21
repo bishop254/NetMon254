@@ -1,0 +1,28 @@
+tkinter is used to create GUI apps with python
+
+you first import it then define a variable that calls the Tk() method.(root = TK())
+
+at the end of the program you should run the variable in a loop (variable.mainloop())
+
+creating items on the window:
+#label -> myLabel = Label(root, text='Hello Konyagi')
+#button -> myButton = Button(root, text='Click me', disabled=False, padx=50, pady=50, command=myClick, bg='blue', fg='#000000')
+
+#inputField  -> myInput = Entry(root, width=50)
+
+
+
+you then pack the items by:
+#myLabel.grid(row=0, column=2)
+#myInput.pack() 
+
+to put default text in myInput:
+#myInput.insert(0, 'Enter your name...')
+
+to obtain the data entered in myInput:
+#myInput.get()
+
+to delete data entered in myInput:
+#myInput.delete(0, END)
+
+ 
