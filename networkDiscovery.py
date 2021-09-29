@@ -1,19 +1,24 @@
 import threading
 from tkinter import *
+from tkinter import ttk
+import time
 import socket
 import struct  # for pckt-sniff route
 import textwrap
 from threading import Thread
+import random
 
 
 from scapy.sendrecv import sniff
 from scapy.utils import wrpcap  # for pckt-sniff route
 
-class Scan2():
+class Scan2:
     def __init__(self, master):
         self.master = master
-    
-    def main_sniff(self):
+        
+    def sniff_main(self):
+        global dstArr, srcArr, protArr
+        
         conn = socket.socket(socket.AF_PACKET, socket.SOCK_RAW, socket.ntohs(3))
         count = 0
         
@@ -21,7 +26,7 @@ class Scan2():
         srcArr = []
         protArr = []
         
-        while (count < 10):
+        while (count < 20):
             count = count + 1    
             raw_data, addr = conn.recvfrom(65536)
             dst_mac, src_mac, eth_proto, data = self.eth_frame(raw_data)
@@ -29,10 +34,14 @@ class Scan2():
             dstArr.append(dst_mac)
             srcArr.append(src_mac)
             protArr.append(eth_proto) 
-            
 
             # print (f"\n Ethernet frame: \n")
             # print('Destination: {}, Source:{}, Protocol:{}'.format(dst_mac, src_mac, eth_proto))
+        
+        packetWdw.after(100, self.main_sniff)
+    
+    def main_sniff(self):
+        packetWdw.destroy()
         
         global packetWindow   
         packetWindow = Toplevel()
@@ -40,7 +49,7 @@ class Scan2():
         packetWindow.geometry('700x500+350+150')
         packetWindow.resizable(True, True)
         packetFrame = Frame(packetWindow, padx=10, pady=10)
-        canvas = Canvas(packetFrame, height=600, width=400)
+        canvas = Canvas(packetFrame, height=700, width=500)
         scrollBar = Scrollbar(packetFrame, orient='vertical', command=canvas.yview)
         scrollFrame = Frame(canvas)
         
@@ -61,17 +70,13 @@ class Scan2():
             label4 = Label(scrollFrame, text='_____________').pack()
             # label5 = Label(scrollFr)
         
-        capture = sniff(iface='wlo1' , count=100)
-        wrpcap('cap1.pcap', capture)
-        thread1 = Thread(None , capture)
-        thread1.start()
-        print(thread1)
-        
+        # capture = sniff(iface='wlo1' , count=100)
+        # wrpcap('cap1.pcap', capture)
         
         packetFrame.pack()
         canvas.pack(side='left', fill='both', expand=True)
         scrollBar.pack(side='right', fill='y')
-        exitButton = Button(packetWindow, text='Go Back...', command=packetWindow.destroy).pack(side='top')
+        exitButton = Button(packetFrame, text='Go Back...', command=packetWindow.destroy).pack(side='top')
 
     def eth_frame(self, data):
         dst_mac, src_mac, proto = struct.unpack('! 6s 6s H', data[:14])
@@ -82,4 +87,22 @@ class Scan2():
         mac_addr = ':'.join(byte_str).upper()
         return mac_addr
     
-    
+    def mainMeth(self):
+        global packetWdw, myProg   
+        packetWdw = Toplevel()
+        packetWdw.title('Sniffed Packets...')
+        packetWdw.geometry('200x100+550+250')
+        packetWdw.resizable(True, True)
+        labelx = Label(packetWdw, text='Loading your screen...').pack(pady=10)
+        
+        myProg = ttk.Progressbar(packetWdw, orient=HORIZONTAL, length=254, mode='indeterminate')
+        myProg.pack(pady=20, padx=10)
+        
+        myProg.start(5)   
+        
+        thr1 = threading.Thread(target=self.sniff_main)
+        thr1.start()
+              
+            
+        
+        

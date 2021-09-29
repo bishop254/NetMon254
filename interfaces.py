@@ -1,49 +1,70 @@
-from speed import SpeedTest
-from sniffing import Sniff
-from scapyTraceroute import ScapyTraceRoute
-from scapii import Scapii
-from networkDiscovery import Scan2
-from scan import Scan
-from tkinter import *
-import ifcfg
 import json
 from functools import partial
+from tkinter import *
+
+import ifcfg
+from PIL import Image, ImageTk
+
+from grAnalysis import GraphAnalysis
+from networkDiscovery import Scan2
+from scan import Scan
+from scapii import Scapii
+from scapyTraceroute import ScapyTraceRoute
+from sniffing import Sniff
+from speed import SpeedTest
+from whoisURL import WhoisLook
 
 root = Tk()
-root.geometry('400x500+200+100')
+root.geometry('800x500+200+100')
 root.attributes('-zoomed', True)
+# root.config(bg='black')
 
+bg = ImageTk.PhotoImage(Image.open("bck10.jpg"))
+
+my_canvas = Canvas(root, width=900, height=500)
+my_canvas.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+my_canvas.create_image(0,0, image=bg, anchor=NW)
 
 class DevInterfaces():
-    
     def __init__(self, master):
         self.master = master
         master.title('Network Monitoring Tool')
     
         self.button1 = Button(master, text='Search for available network adapter information', command=self.openInterfaces)
-        self.button1.pack()
+        btn1_wndw = my_canvas.create_window(50,40, anchor='nw', window=self.button1)
         
         scan1 = Scan(master)
-        self.button2 = Button(master, text='Search Other Devices on the Network', command=scan1.arpscan)
-        self.button2.pack()
-        
+        self.button2 = Button(master, text='Search Other Devices on the Network', command=scan1.actualScan)
+        btn2_wndw = my_canvas.create_window(50,90, anchor='nw', window=self.button2)
+
         scan2 = Scan2(master)
-        self.button2 = Button(master, text='Sniff Packets on the Network', command=scan2.main_sniff)
-        self.button2.pack()
+        self.button21 = Button(master, text='Sniff Packets on the Network', command=scan2.mainMeth)
+        btn2_wndw = my_canvas.create_window(50,140, anchor='nw', window=self.button21)
 
         scan3 = ScapyTraceRoute(master)         
-        self.button3 = Button(master, text='Trace route to google', command=scan3.trace)
-        self.button3.pack()   
-        
+        self.button3 = Button(master, text='Trace route to a website/IP', command=scan3.trace)
+        btn3_wndw = my_canvas.create_window(50,190, anchor='nw', window=self.button3)
+       
         scan4 = Sniff(master)         
-        self.button4 = Button(master, text='Sniff Packets', command=scan4.mainSniff)
-        self.button4.pack() 
-        
+        self.button4 = Button(master, text='Sniff Packets in real-time', command=scan4.mainSniff)
+        btn4_wndw = my_canvas.create_window(50,240, anchor='nw', window=self.button4)
+      
         scan5 = SpeedTest(master)
-        self.button4 = Button(master, text='Speed test', command=scan5.cmdLine)
-        self.button4.pack()        
-    
+        self.button5 = Button(master, text='Speed test', command=scan5.mainSpeed)
+        btn5_wndw = my_canvas.create_window(50,290, anchor='nw', window=self.button5)
+     
+        scan6 = GraphAnalysis(master)
+        self.button6 = Button(master, text='Perform analysis on packets', command=scan6.mainAnalysisMeth)
+        btn6_wndw = my_canvas.create_window(50,340, anchor='nw', window=self.button6)
+
+        scan7 = WhoisLook(master)
+        self.button7 = Button(master, text='Check if a website is registered(whois-lookup)', command=scan7.whoisScan)
+        btn7_wndw = my_canvas.create_window(50,390, anchor='nw', window=self.button7)
+        
+
     def openInterfaces(self):
+        self.button1.config(state=DISABLED)
         global top
         top = Toplevel()
         top.title('Device Interface Info')
@@ -93,17 +114,13 @@ class DevInterfaces():
             myLabel3 = Label(myFrame, borderwidth=5, fg='white', bg='black', text='MAC ADDRESS : \n ' + str(devObj[num]['ether'])).pack()
             addInfoButton = Button(myFrame, fg='white', bg='grey', text='Additional Device Data', command=partial(openDevInfo, num)).pack()
             myLabel = Label(myFrame, text='_________________').pack(padx=5, pady=5)
-            self.button1['state'] = 'disabled'    
+           
 
-            # response = Scapii(myFrame1)
-            # myLabel4 = Label(myFrame1, text=devObj[num]['device'] + ' : \t' + str(response.cmdLine(devObj[num]['device']))).pack()
-            # print(response.cmdLine(devObj[num]['device']))
-            
         interfaceButton = Button(myFrame1, command=self.close, text='Exit to Main Page')
         interfaceButton.pack()
          
     def close(self):
-        self.button1['state'] = 'active'
+        self.button1.config(state=ACTIVE)
         top.destroy()
  
 int1 = DevInterfaces(root)

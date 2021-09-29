@@ -86,7 +86,7 @@ def main():
             whooheight = sourcenum.get(str(ipa))			
             hooheight = whooheight/(18000/292)
             hoheight = 330-hooheight
-            print (hoheight)	        
+            print (hoheight)	         
 
             if hoheight >= 30:
                 hoopyheight = hoheight

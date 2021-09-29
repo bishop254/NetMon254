@@ -12,23 +12,30 @@ class ScapyTraceRoute():
         traceVal = StringVar()
         
         try:
-            global scanWindow   
+            global scanWindow , bg 
             scanWindow = Toplevel()
             scanWindow.title('Trace route page')
             scanWindow.geometry('400x300+350+150')
             scanWindow.resizable(True, True)
             
+            bg = ImageTk.PhotoImage(Image.open("bck2.jpg"))
+
+            my_canvas = Canvas(scanWindow, width=400, height=300)
+            my_canvas.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+            my_canvas.create_image(0,0, image=bg, anchor=NW)
+            
             def saveVar(label, entry):
                 global name
                 name = traceVal.get()
                 print(name)
-                newTraceLabel =  Label(scanWindow, text='Carrying out tasks in the background...').pack(anchor=CENTER)
+                # newTraceLabel =  Label(scanWindow, text='Carrying out tasks in the background...').pack(anchor=CENTER)
                 scanWindow.destroy()
                 self.trace2()
             
-            newTraceLabel = Label(scanWindow, text='Enter URL or IP address to trace the route').pack()
-            newTraceInput = Entry(scanWindow, textvariable=traceVal).pack()
-            newTraceButton = Button(scanWindow, text='Click to run custom scan...', command=partial(saveVar, newTraceLabel, newTraceInput)).pack(anchor=N)
+            newTraceLabel = Label(my_canvas, text='Enter URL or IP address to trace the route').pack(padx=10, pady=10)
+            newTraceInput = Entry(my_canvas, textvariable=traceVal).pack(padx=10, pady=10)
+            newTraceButton = Button(my_canvas, text='Click to run custom scan...', command=partial(saveVar, newTraceLabel, newTraceInput)).pack(anchor=N, padx=10, pady=10)
             
         except:
             pass

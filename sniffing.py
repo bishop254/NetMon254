@@ -7,6 +7,7 @@ import scapy.all as scapy
 from scapy import packet
 
 from scan import Scan
+from PIL import ImageTk, Image
 
 
 class Sniff():
@@ -15,7 +16,7 @@ class Sniff():
     
     def startBtn(self):
         print('Sniffing started')
-        labelStart = Label(scanWindow, text='Sniffing started').pack()
+        labelStart = Label(my_canvas, text='Sniffing started').pack(padx=5, pady=5)
         
         global should_we_stop, subdomain
         global thread
@@ -31,12 +32,15 @@ class Sniff():
             should_we_stop = False
             thread = threading.Thread(target=self.sniffing)
             thread.start()
-    
+
     def stopBtn(self):
         global should_we_stop
+        print('Sniffing stopped')
+        labelStart = Label(my_canvas, text='Sniffing stopped...').pack(padx=5, pady=5)
         should_we_stop = True
         
     def stopSniffing(self, x):
+        
         global should_we_stop
         return should_we_stop
     
@@ -70,11 +74,18 @@ class Sniff():
                         print(srcIp, dstIp)
     def mainSniff(self):
         try:
-            global scanWindow, thread, should_we_stop, srcIpDict, treev   
+            global scanWindow, thread, should_we_stop, srcIpDict, treev, bg, my_canvas
             scanWindow = Toplevel()
             scanWindow.title('Sniff packets in real-time')
             scanWindow.geometry('600x400')
             scanWindow.resizable(True, True)
+            
+            bg = ImageTk.PhotoImage(Image.open("bck9.jpg"))
+
+            my_canvas = Canvas(scanWindow, width=600, height=400)
+            my_canvas.pack(fill=BOTH, expand=True, padx=10, pady=10)
+
+            my_canvas.create_image(0,0, image=bg, anchor=NW)
             
             thread = None
             should_we_stop = True
@@ -82,19 +93,19 @@ class Sniff():
             
             srcIpDict = collections.defaultdict(list)
 
-            Label1 = Label(scanWindow, text='Packet Tracer').pack()
-            Label2 = Label(scanWindow, text='Click start to begin sniffing...').pack()
-            Label2 = Label(scanWindow, text='Ensure to stop sniffing before you close the window').pack()
+            Label1 = Label(my_canvas, text='Packet Tracer').pack(padx=5, pady=5)
+            Label2 = Label(my_canvas, text='Click start to begin sniffing...').pack(padx=5, pady=5)
+            Label2 = Label(my_canvas, text='Ensure to stop sniffing before you close the window').pack(padx=5, pady=5)
 
-            treev = ttk.Treeview(scanWindow, height=400)
+            treev = ttk.Treeview(my_canvas, height=400)
             treev.column('#0')
 
-            button_frame = Frame(scanWindow)
+            button_frame = Frame(my_canvas)
             btn1 = Button(button_frame, text='Start sniff', command=self.startBtn).pack(side=LEFT)
             btn2 = Button(button_frame, text='Stop sniff', command=self.stopBtn).pack(side=LEFT)
             exitBtn = Button(button_frame, text='Exit to main program', command=scanWindow.destroy).pack(side=LEFT)
 
-            button_frame.pack(side=BOTTOM, pady=10)
+            button_frame.pack(side=BOTTOM, padx=5, pady=5)
 
         except TypeError as e:
             print(e)
